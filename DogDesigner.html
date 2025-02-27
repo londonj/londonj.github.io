@@ -9,6 +9,7 @@
     <style>
         :root {
             --primary-color: #5D5CDE;
+            --button-color: #2563EB; /* Blue button color */
             --light-bg-color: #FFFFFF;
             --light-text-color: #333333;
             --dark-bg-color: #181818;
@@ -119,16 +120,20 @@
             color: var(--dark-text-color);
         }
 
-        button {
-            background-color: var(--primary-color);
-            color: #FFFFFF;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        #generateButton {
+            background-color: #0066FF !important; /* Bright blue color */
+            color: #FFFFFF !important;
+            border: 2px solid #0044CC !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* stronger shadow */
+            padding: 14px !important;
+            font-size: 18px !important;
+            margin-top: 10px !important;
         }
 
         button:hover {
