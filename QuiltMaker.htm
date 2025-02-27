@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Quilt Designer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.0/flowbite.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --light-bg: #FFFFFF;
+            --dark-bg: #181818;
+            --light-text: #333333;
+            --dark-text: #F3F4F6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--dark-bg);
+                color: var(--dark-text);
+            }
+            .card {
+                background-color: #242424;
+                color: var(--dark-text);
+            }
+            .custom-radio label span {
+                color: var(--dark-text);
+            }
+            .custom-select {
+                background-color: #242424;
+                color: var(--dark-text);
+                border-color: #4B5563;
+            }
+            .submit-btn {
+                background-color: var(--primary-color);
+                color: white;
+            }
+            .back-btn {
+                background-color: #4B5563;
+                color: white;
+            }
+            #canvasContainer {
+                background-color: #242424;
+                border: 1px solid #4B5563;
+            }
+            progress {
+                background-color: #374151;
+            }
+            progress::-webkit-progress-bar {
+                background-color: #374151;
+            }
+            progress::-webkit-progress-value {
+                background-color: var(--primary-color);
+            }
+            progress::-moz-progress-bar {
+                background-color: var(--primary-color);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: var(--light-bg);
+                color: var(--light-text);
+            }
+            .card {
+                background-color: white;
+                color: var(--light-text);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .custom-radio label span {
+                color: var(--light-text);
+            }
+            .custom-select {
+                background-color: white;
+                color: var(--light-text);
+                border-color: #D1D5DB;
+            }
+            .submit-btn {
+                background-color: var(--primary-color);
+                color: white;
+            }
+            .back-btn {
+                background-color: #9CA3AF;
+                color: white;
+            }
+            #canvasContainer {
+                background-color: white;
+                border: 1px solid #E5E7EB;
+            }
+            progress {
+                background-color: #E5E7EB;
+            }
+            progress::-webkit-progress-bar {
+                background-color: #E5E7EB;
+            }
+            progress::-webkit-progress-value {
+                background-color: var(--primary-color);
+            }
+            progress::-moz-progress-bar {
+                background-color: var(--primary-color);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .custom-radio label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .custom-radio input[type="radio"] {
+            display: none;
+        }
+
+        .custom-radio input[type="radio"] + label {
+            border: 2px solid #D1D5DB;
+        }
+
+        .custom-radio input[type="radio"]:checked + label {
+            border-color: var(--primary-color);
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+
+        .custom-radio input[type="radio"] + label:before {
+            content: '';
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+            border-radius: 50%;
+            border: 2px solid #D1D5DB;
+            background-color: white;
+        }
+
+        .custom-radio input[type="radio"]:checked + label:before {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: inset 0 0 0 4px white;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .submit-btn, .back-btn {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover, .back-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .custom-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+
+        .progress-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        progress {
+            width: 100%;
+            height: 0.75rem;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .color-sample {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 1px solid #D1D5DB;
+            vertical-align: middle;
+        }
+        
+        /* Materials Modal Styles */
+        .materials-card {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .materials-card {
+                background-color: #242424;
+                color: var(--dark-text);
+                border: 1px solid #4B5563;
+            }
+            
+            .material-item {
+                border-color: #4B5563;
+            }
+        }
+        
+        .material-item {
+            padding: 12px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .material-color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 12px;
+            border: 1px solid #D1D5DB;
+        }
+
+        .question-page {
+            display: none;
+        }
+
+        .question-page.active {
+            display: block;
+        }
+
+        .question-section {
+            margin-bottom: 2rem;
+        }
+
+        .question-section:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex flex-col items-center justify-center">
+    <div class="container max-w-md mx-auto">
+        <div id="form-container" class="card rounded-lg p-6 mb-4 w-full fade-in">
+            <h1 class="text-2xl font-bold text-center mb-6">Custom Quilt Designer</h1>
+            
+            <div class="progress-container">
+                <progress id="progress-bar" value="0" max="100"></progress>
+                <p id="progress-text" class="text-sm text-center mt-1">Page 1 of 3</p>
+            </div>
+
+            <!-- Page 1: Pattern Type and Color Scheme -->
+            <div id="page-1" class="question-page active">
+                <!-- Question 1: Pattern Type -->
+                <div id="question-1" class="question-section">
+                    <h2 class="card-title">Choose a quilt pattern:</h2>
+                    <div class="mb-4">
+                        <select id="pattern-select" name="pattern" class="custom-select text-base">
+                            <option value="" disabled selected>Select a pattern...</option>
+                            <option value="log-cabin">Log Cabin</option>
+                            <option value="nine-patch">Nine Patch</option>
+                            <option value="flying-geese">Flying Geese</option>
+                            <option value="star">Star Pattern</option>
+                            <option value="dresden-plate">Dresden Plate</option>
+                            <option value="hexagon">Hexagon/Honeycomb</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Question 2: Color Scheme -->
+                <div id="question-2" class="question-section">
+                    <h2 class="card-title">Select a color scheme:</h2>
+                    <div class="mb-4">
+                        <select id="color-select" name="colorScheme" class="custom-select text-base">
+                            <option value="" disabled selected>Select a color scheme...</option>
+                            <option value="warm" data-color="#FF5733">Warm (reds, oranges, yellows)</option>
+                            <option value="cool" data-color="#3498DB">Cool (blues, greens, purples)</option>
+                            <option value="blues" data-color="#1E3A8A">Blues (navy, royal, light blue tones)</option>
+                            <option value="neutral" data-color="#BDC3C7">Neutral (beiges, grays, whites)</option>
+                            <option value="rainbow" data-color="rainbow">Rainbow (all colors)</option>
+                            <option value="monochromatic" data-color="#734B5E">Monochromatic (shades of one color)</option>
+                            <option value="earthy" data-color="#8B6B4C">Earthy (moss greens, rust, terracotta, browns)</option>
+                        </select>
+                    </div>
+                    <div id="color-preview" class="h-8 rounded border overflow-hidden mt-2 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Page 2: Size and Block Size -->
+            <div id="page-2" class="question-page">
+                <!-- Question 3: Size -->
+                <div id="question-3" class="question-section">
+                    <h2 class="card-title">How big should the quilt be?</h2>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="custom-radio">
+                            <input type="radio" id="size-small" name="size" value="small">
+                            <label for="size-small">
+                                <span>Small (Lap Quilt)</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="size-medium" name="size" value="medium">
+                            <label for="size-medium">
+                                <span>Medium (Twin Size)</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="size-large" name="size" value="large">
+                            <label for="size-large">
+                                <span>Large (Queen Size)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 4: Block Size -->
+                <div id="question-4" class="question-section">
+                    <h2 class="card-title">Select the block size:</h2>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="custom-radio">
+                            <input type="radio" id="block-small" name="blockSize" value="small">
+                            <label for="block-small">
+                                <span>Small Blocks (many pieces)</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="block-medium" name="blockSize" value="medium">
+                            <label for="block-medium">
+                                <span>Medium Blocks</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="block-large" name="blockSize" value="large">
+                            <label for="block-large">
+                                <span>Large Blocks (fewer pieces)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3: Style and Designer Influence -->
+            <div id="page-3" class="question-page">
+                <!-- Question 5: Style -->
+                <div id="question-5" class="question-section">
+                    <h2 class="card-title">Choose a style:</h2>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="custom-radio">
+                            <input type="radio" id="style-traditional" name="style" value="traditional">
+                            <label for="style-traditional">
+                                <span>Traditional</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="style-modern" name="style" value="modern">
+                            <label for="style-modern">
+                                <span>Modern</span>
+                            </label>
+                        </div>
+                        <div class="custom-radio">
+                            <input type="radio" id="style-artistic" name="style" value="artistic">
+                            <label for="style-artistic">
+                                <span>Artistic/Abstract</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Question 6: Designer Influence -->
+                <div id="question-6" class="question-section">
+                    <h2 class="card-title">Choose a designer influence (optional):</h2>
+                    <div class="mb-4">
+                        <select id="designer-select" name="designer" class="custom-select text-base">
+                            <option value="" disabled selected>Select a designer influence...</option>
+                            <option value="none">No specific designer influence</option>
+                            <option value="tula-pink">Tula Pink (bright colors, animal motifs, whimsical designs)</option>
+                            <option value="kaffe-fassett">Kaffe Fassett (bold colors, floral patterns)</option>
+                            <option value="amish">Amish Style (solid colors, geometric patterns)</option>
+                            <option value="gwen-marston">Gwen Marston (improvisational, liberated style)</option>
+                            <option value="jinny-beyer">Jinny Beyer (intricate geometrics, border prints)</option>
+                            <option value="jen-kingwell">Jen Kingwell (scrappy patchwork, vintage feel)</option>
+                            <option value="william-morris">William Morris (Arts & Crafts movement, nature motifs)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-8">
+                <button id="back-btn" class="back-btn hidden">Back</button>
+                <button id="next-btn" class="submit-btn ml-auto">Next</button>
+                <button id="generate-btn" class="submit-btn ml-auto hidden">Generate Quilt</button>
+            </div>
+        </div>
+
+        <div id="result-container" class="card rounded-lg p-6 w-full hidden fade-in">
+            <h2 class="card-title text-center">Your Custom Quilt</h2>
+            <div id="loading-container" class="text-center py-8">
+                <p>Generating your custom quilt...</p>
+                <div class="mt-4 flex justify-center">
+                    <svg class="animate-spin h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div id="canvasContainer" class="w-full rounded-lg overflow-hidden flex justify-center items-center p-4 hidden">
+                <img id="generatedImage" class="max-w-full rounded shadow-lg" alt="Generated Quilt" />
+            </div>
+            <div id="quiltDetails" class="mt-6 hidden">
+                <h3 class="font-semibold text-lg mb-2">Quilt Details:</h3>
+                <ul id="quiltDetailsList" class="list-disc pl-5 space-y-1"></ul>
+            </div>
+            <div class="flex flex-wrap justify-between gap-2 mt-8">
+                <button id="start-over-btn" class="back-btn">Start Over</button>
+                <div class="flex gap-2">
+                    <button id="materials-btn" class="submit-btn">Get Materials</button>
+                    <button id="download-hint-btn" class="submit-btn">Save Image</button>
+                </div>
+            </div>
+            
+            <!-- Materials Modal -->
+            <div id="materials-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="materials-card relative rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                    <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <h3 class="text-xl font-semibold mb-4">Materials Needed</h3>
+                    <div id="materials-content">
+                        <!-- Materials will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pages = document.querySelectorAll('.question-page');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const nextBtn = document.getElementById('next-btn');
+            const backBtn = document.getElementById('back-btn');
+            const generateBtn = document.getElementById('generate-btn');
+            const formContainer = document.getElementById('form-container');
+            const resultContainer = document.getElementById('result-container');
+            const loadingContainer = document.getElementById('loading-container');
+            const canvasContainer = document.getElementById('canvasContainer');
+            const generatedImage = document.getElementById('generatedImage');
+            const quiltDetails = document.getElementById('quiltDetails');
+            const quiltDetailsList = document.getElementById('quiltDetailsList');
+            const startOverBtn = document.getElementById('start-over-btn');
+            const downloadHintBtn = document.getElementById('download-hint-btn');
+
+            let currentPage = 0;
+            const totalPages = pages.length;
+            const answers = {};
+
+            // Initialize the first page
+            updateProgressBar();
+            showPage(currentPage);
+
+            // Event listeners for navigation
+            nextBtn.addEventListener('click', nextPage);
+            backBtn.addEventListener('click', previousPage);
+            generateBtn.addEventListener('click', generateQuilt);
+            startOverBtn.addEventListener('click', startOver);
+            downloadHintBtn.addEventListener('click', showDownloadHint);
+
+            function showPage(index) {
+                pages.forEach((p, i) => {
+                    if (i === index) {
+                        p.classList.add('active');
+                    } else {
+                        p.classList.remove('active');
+                    }
+                });
+
+                // Show/hide navigation buttons
+                if (index === 0) {
+                    backBtn.classList.add('hidden');
+                } else {
+                    backBtn.classList.remove('hidden');
+                }
+
+                if (index === totalPages - 1) {
+                    nextBtn.classList.add('hidden');
+                    generateBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    generateBtn.classList.add('hidden');
+                }
+            }
+
+            // Add color selector preview functionality
+            const colorSelect = document.getElementById('color-select');
+            const colorPreview = document.getElementById('color-preview');
+            
+            if (colorSelect) {
+                colorSelect.addEventListener('change', function() {
+                    const colorValue = this.options[this.selectedIndex].getAttribute('data-color');
+                    colorPreview.classList.remove('hidden');
+                    
+                    if (colorValue === 'rainbow') {
+                        colorPreview.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)';
+                    } else {
+                        colorPreview.style.backgroundColor = colorValue;
+                    }
+                });
+            }
+            
+            function nextPage() {
+                const currentPageElement = pages[currentPage];
+                let isValid = true;
+                
+                // Validate current page
+                if (currentPage === 0) {
+                    // Page 1: Pattern and Color dropdowns
+                    const patternSelect = document.getElementById('pattern-select');
+                    const colorSelect = document.getElementById('color-select');
+                    
+                    if (patternSelect.value === "") {
+                        alert('Please select a quilt pattern to continue.');
+                        isValid = false;
+                        return;
+                    }
+                    
+                    if (colorSelect.value === "") {
+                        alert('Please select a color scheme to continue.');
+                        isValid = false;
+                        return;
+                    }
+                    
+                    // Save answers
+                    answers['pattern'] = patternSelect.value;
+                    answers['colorScheme'] = colorSelect.value;
+                    
+                } else if (currentPage === 1) {
+                    // Page 2: Size and Block Size radio buttons
+                    const sizeRadios = document.querySelectorAll('input[name="size"]:checked');
+                    const blockSizeRadios = document.querySelectorAll('input[name="blockSize"]:checked');
+                    
+                    if (sizeRadios.length === 0) {
+                        alert('Please select a quilt size to continue.');
+                        isValid = false;
+                        return;
+                    }
+                    
+                    if (blockSizeRadios.length === 0) {
+                        alert('Please select a block size to continue.');
+                        isValid = false;
+                        return;
+                    }
+                    
+                    // Save answers
+                    answers['size'] = sizeRadios[0].value;
+                    answers['blockSize'] = blockSizeRadios[0].value;
+                }
+                
+                if (isValid) {
+                    // Move to next page
+                    currentPage++;
+                    if (currentPage < totalPages) {
+                        showPage(currentPage);
+                        updateProgressBar();
+                    }
+                }
+            }
+
+            function previousPage() {
+                currentPage--;
+                if (currentPage >= 0) {
+                    showPage(currentPage);
+                    updateProgressBar();
+                }
+            }
+
+            function updateProgressBar() {
+                const progress = ((currentPage) / (totalPages - 1)) * 100;
+                progressBar.value = progress;
+                progressText.textContent = `Page ${currentPage + 1} of ${totalPages}`;
+            }
+
+            function generateQuilt() {
+                // Validate and save answers from the last page
+                const styleRadios = document.querySelectorAll('input[name="style"]:checked');
+                const designerSelect = document.getElementById('designer-select');
+                
+                if (styleRadios.length === 0) {
+                    alert('Please select a style to continue.');
+                    return;
+                }
+                
+                if (designerSelect.value === "") {
+                    alert('Please select a designer influence to continue.');
+                    return;
+                }
+                
+                // Save answers
+                answers['style'] = styleRadios[0].value;
+                answers['designer'] = designerSelect.value;
+
+                // Hide form and show results
+                formContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                loadingContainer.classList.remove('hidden');
+                canvasContainer.classList.add('hidden');
+                quiltDetails.classList.add('hidden');
+
+                // Construct the prompt for FLUX
+                const prompt = buildQuiltPrompt(answers);
+
+                // Call FLUX to generate the quilt image
+                window.Poe.registerHandler("quilt-handler", (result) => {
+                    const msg = result.responses[0];
+
+                    if (msg.status === "error") {
+                        loadingContainer.innerHTML = `<p class="text-red-500">Error: ${msg.statusText || 'Failed to generate quilt'}</p>`;
+                    } else if (msg.status === "complete") {
+                        if (msg.attachments?.length > 0) {
+                            const imageAttachment = msg.attachments[0];
+                            generatedImage.src = imageAttachment.url;
+                            
+                            loadingContainer.classList.add('hidden');
+                            canvasContainer.classList.remove('hidden');
+                            quiltDetails.classList.remove('hidden');
+                            
+                            // Display quilt details
+                            displayQuiltDetails(answers);
+                        } else {
+                            loadingContainer.innerHTML = "<p class='text-red-500'>No image was generated. Please try again.</p>";
+                        }
+                    }
+                });
+
+                try {
+                    window.Poe.sendUserMessage(
+                        `@FLUX-pro-1.1 ${prompt}`,
+                        {
+                            handler: "quilt-handler",
+                            stream: false,
+                            openChat: false
+                        }
+                    );
+                } catch (err) {
+                    loadingContainer.innerHTML = `<p class="text-red-500">Error: ${err.message || 'Failed to generate quilt'}</p>`;
+                }
+            }
+
+            function buildQuiltPrompt(answers) {
+                // Define pattern descriptions for each pattern type
+                const patternDescriptions = {
+                    'log-cabin': 'a log cabin pattern quilt with concentric squares',
+                    'nine-patch': 'a nine-patch pattern quilt with alternating squares',
+                    'flying-geese': 'a flying geese pattern quilt with triangular blocks',
+                    'star': 'a star pattern quilt with eight-pointed stars',
+                    'dresden-plate': 'a Dresden plate pattern quilt with circular floral-like designs made from wedge shapes',
+                    'hexagon': 'a hexagon/honeycomb pattern quilt with six-sided geometric shapes'
+                };
+
+                // Define color schemes
+                const colorSchemes = {
+                    'warm': 'warm colors (reds, oranges, yellows)',
+                    'cool': 'cool colors (blues, greens, purples)',
+                    'blues': 'blue color palette (navy, royal, sky blue, and teal accents)',
+                    'neutral': 'neutral colors (beiges, grays, whites)',
+                    'rainbow': 'vibrant rainbow colors',
+                    'monochromatic': 'monochromatic purple shades with varying tints and tones',
+                    'earthy': 'earthy tones (moss greens, rust, terracotta, and browns)'
+                };
+
+                // Define style descriptions
+                const styleDescriptions = {
+                    'traditional': 'traditional quilting style with classic patterns',
+                    'modern': 'modern minimalist quilting style with bold shapes',
+                    'artistic': 'artistic and creative abstract quilting style'
+                };
+                
+                // Define designer styles
+                const designerStyles = {
+                    'none': '',
+                    'tula-pink': 'in the style of Tula Pink with bright colors, whimsical designs, and detailed animal motifs',
+                    'kaffe-fassett': 'in the style of Kaffe Fassett with bold, vibrant colors and lush floral patterns',
+                    'amish': 'in the Amish quilting style with solid colors, geometric patterns, and crisp lines',
+                    'gwen-marston': 'in the style of Gwen Marston with an improvisational, liberated approach and bold shapes',
+                    'jinny-beyer': 'in the style of Jinny Beyer with intricate geometric patterns, precise piecing, and elaborate border designs',
+                    'jen-kingwell': 'in the style of Jen Kingwell with scrappy patchwork, vintage-inspired colors, and a mix of traditional and contemporary elements',
+                    'william-morris': 'in the style of William Morris with Arts & Crafts movement patterns, intricate botanical motifs, and rich jewel-toned colors'
+                };
+
+                // Build the prompt string
+                let prompt = `A detailed, realistic ${answers.pattern} quilt design in ${colorSchemes[answers.colorScheme]}, ${styleDescriptions[answers.style]}`;
+                
+                // Add designer influence if selected
+                if (answers.designer && answers.designer !== 'none') {
+                    prompt += ` ${designerStyles[answers.designer]}`;
+                }
+                
+                // Add size details
+                if (answers.size === 'small') {
+                    prompt += '. This is a small lap quilt';
+                } else if (answers.size === 'medium') {
+                    prompt += '. This is a medium-sized twin quilt';
+                } else {
+                    prompt += '. This is a large queen-sized quilt';
+                }
+                
+                // Add block size details
+                if (answers.blockSize === 'small') {
+                    prompt += ' with many small intricate blocks';
+                } else if (answers.blockSize === 'medium') {
+                    prompt += ' with medium-sized blocks';
+                } else {
+                    prompt += ' with large bold blocks';
+                }
+                
+                // Final touches to make it look realistic
+                prompt += '. The quilt should have visible stitching patterns, texture, and fabric details. Photographed in natural light on a bed or wall.';
+                
+                return prompt;
+            }
+
+            function displayQuiltDetails(answers) {
+                // Clear previous details
+                quiltDetailsList.innerHTML = '';
+                
+                // Pattern
+                const patternNames = {
+                    'log-cabin': 'Log Cabin',
+                    'nine-patch': 'Nine Patch',
+                    'flying-geese': 'Flying Geese',
+                    'star': 'Star Pattern',
+                    'dresden-plate': 'Dresden Plate',
+                    'hexagon': 'Hexagon/Honeycomb'
+                };
+                
+                // Colors
+                const colorNames = {
+                    'warm': 'Warm (reds, oranges, yellows)',
+                    'cool': 'Cool (blues, greens, purples)',
+                    'blues': 'Blues (navy, royal, light blue tones)',
+                    'neutral': 'Neutral (beiges, grays, whites)',
+                    'rainbow': 'Rainbow (vibrant colors)',
+                    'monochromatic': 'Monochromatic (shades of one color)',
+                    'earthy': 'Earthy (moss greens, rust, terracotta, browns)'
+                };
+                
+                // Size
+                const sizeNames = {
+                    'small': 'Small (Lap Quilt)',
+                    'medium': 'Medium (Twin Size)',
+                    'large': 'Large (Queen Size)'
+                };
+                
+                // Block size
+                const blockSizeNames = {
+                    'small': 'Small Blocks',
+                    'medium': 'Medium Blocks',
+                    'large': 'Large Blocks'
+                };
+                
+                // Style
+                const styleNames = {
+                    'traditional': 'Traditional',
+                    'modern': 'Modern',
+                    'artistic': 'Artistic/Abstract'
+                };
+                
+                // Designer influence
+                const designerNames = {
+                    'none': 'None',
+                    'tula-pink': 'Tula Pink',
+                    'kaffe-fassett': 'Kaffe Fassett',
+                    'amish': 'Amish Style',
+                    'gwen-marston': 'Gwen Marston',
+                    'jinny-beyer': 'Jinny Beyer',
+                    'jen-kingwell': 'Jen Kingwell',
+                    'william-morris': 'William Morris'
+                };
+                
+                // Add details to the list
+                const detailItems = [
+                    `<li><strong>Pattern:</strong> ${patternNames[answers.pattern]}</li>`,
+                    `<li><strong>Color Scheme:</strong> ${colorNames[answers.colorScheme]}</li>`,
+                    `<li><strong>Size:</strong> ${sizeNames[answers.size]}</li>`,
+                    `<li><strong>Block Size:</strong> ${blockSizeNames[answers.blockSize]}</li>`,
+                    `<li><strong>Style:</strong> ${styleNames[answers.style]}</li>`
+                ];
+                
+                // Add designer influence if selected
+                if (answers.designer && answers.designer !== 'none') {
+                    detailItems.push(`<li><strong>Designer Influence:</strong> ${designerNames[answers.designer]}</li>`);
+                }
+                
+                quiltDetailsList.innerHTML = detailItems.join('');
+            }
+
+            function startOver() {
+                // Reset to first page
+                currentPage = 0;
+                
+                // Clear selected options
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                // Reset dropdowns
+                document.getElementById('pattern-select').selectedIndex = 0;
+                document.getElementById('color-select').selectedIndex = 0;
+                document.getElementById('designer-select').selectedIndex = 0;
+                
+                // Hide color preview
+                colorPreview.classList.add('hidden');
+                
+                // Reset progress bar
+                updateProgressBar();
+                
+                // Show first page
+                showPage(currentPage);
+                
+                // Switch back to form view
+                resultContainer.classList.add('hidden');
+                formContainer.classList.remove('hidden');
+            }
+
+            function showDownloadHint() {
+                alert('To save this image, right-click (or press and hold on mobile) on the quilt image and select "Save image as..."');
+            }
+            
+            // Materials Modal Functions
+            const materialsBtn = document.getElementById('materials-btn');
+            const materialsModal = document.getElementById('materials-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const materialsContent = document.getElementById('materials-content');
+            
+            materialsBtn.addEventListener('click', showMaterialsModal);
+            closeModalBtn.addEventListener('click', hideMaterialsModal);
+            
+            // Close modal when clicking outside of it
+            materialsModal.addEventListener('click', function(event) {
+                if (event.target === materialsModal) {
+                    hideMaterialsModal();
+                }
+            });
+            
+            function showMaterialsModal() {
+                calculateMaterials(answers);
+                materialsModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+            }
+            
+            function hideMaterialsModal() {
+                materialsModal.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Restore scrolling
+            }
+            
+            function calculateMaterials(answers) {
+                // Clear previous materials
+                materialsContent.innerHTML = '';
+                
+                // Get quilt dimensions based on size
+                let quiltWidth, quiltLength;
+                if (answers.size === 'small') {
+                    quiltWidth = 48; // inches
+                    quiltLength = 60; // inches
+                } else if (answers.size === 'medium') {
+                    quiltWidth = 70; // inches
+                    quiltLength = 90; // inches
+                } else {
+                    quiltWidth = 90; // inches
+                    quiltLength = 108; // inches
+                }
+                
+                // Calculate fabric needed based on size and block size
+                let mainFabricYards, accentFabricYards, bindingYards, backingYards, battingYards;
+                
+                // Basic calculations for main fabric (front of quilt)
+                const totalSquareInches = quiltWidth * quiltLength;
+                
+                // Adjust based on block size
+                let blockComplexityFactor;
+                if (answers.blockSize === 'small') {
+                    blockComplexityFactor = 1.3; // More seam allowances and potential waste
+                } else if (answers.blockSize === 'medium') {
+                    blockComplexityFactor = 1.2;
+                } else {
+                    blockComplexityFactor = 1.1; // Less seam allowances
+                }
+                
+                // Main fabric (convert square inches to square yards, then to linear yards with standard 44" fabric width)
+                mainFabricYards = Math.ceil((totalSquareInches * 0.7 * blockComplexityFactor) / (44 * 36)) + 0.5;
+                
+                // Accent fabric (typically about 30% of the quilt)
+                accentFabricYards = Math.ceil((totalSquareInches * 0.3 * blockComplexityFactor) / (44 * 36)) + 0.5;
+                
+                // Binding (perimeter of quilt)
+                const perimeter = 2 * (quiltWidth + quiltLength);
+                bindingYards = Math.ceil((perimeter * 2.5) / 36) + 0.25; // 2.5" strips
+                
+                // Backing (needs to be a bit larger than the quilt top)
+                backingYards = Math.ceil(((quiltWidth + 8) * (quiltLength + 8)) / (44 * 36) * 1.1);
+                
+                // Batting (same as backing)
+                battingYards = Math.ceil(((quiltWidth + 8) * (quiltLength + 8)) / (90 * 36)); // Batting is usually 90" wide
+                
+                // Generate colors based on color scheme
+                let mainColors = [], accentColors = [];
+                
+                if (answers.colorScheme === 'warm') {
+                    mainColors = [
+                        { name: 'Ruby Red', hex: '#E0115F' },
+                        { name: 'Burnt Orange', hex: '#CC5500' },
+                        { name: 'Golden Yellow', hex: '#FFDF00' }
+                    ];
+                    accentColors = [
+                        { name: 'Deep Crimson', hex: '#900C3F' },
+                        { name: 'Terracotta', hex: '#E2725B' }
+                    ];
+                } else if (answers.colorScheme === 'blues') {
+                    mainColors = [
+                        { name: 'Navy Blue', hex: '#1E3A8A' },
+                        { name: 'Royal Blue', hex: '#2563EB' },
+                        { name: 'Sky Blue', hex: '#7DD3FC' }
+                    ];
+                    accentColors = [
+                        { name: 'Teal', hex: '#0D9488' },
+                        { name: 'French Blue', hex: '#3B82F6' },
+                        { name: 'Deep Indigo', hex: '#312E81' }
+                    ];
+                } else if (answers.colorScheme === 'cool') {
+                    mainColors = [
+                        { name: 'Royal Blue', hex: '#4169E1' },
+                        { name: 'Emerald Green', hex: '#50C878' },
+                        { name: 'Lavender', hex: '#B57EDC' }
+                    ];
+                    accentColors = [
+                        { name: 'Navy Blue', hex: '#000080' },
+                        { name: 'Teal', hex: '#008080' }
+                    ];
+                } else if (answers.colorScheme === 'neutral') {
+                    mainColors = [
+                        { name: 'Cream', hex: '#FFFDD0' },
+                        { name: 'Taupe', hex: '#B38B6D' },
+                        { name: 'Light Gray', hex: '#D3D3D3' }
+                    ];
+                    accentColors = [
+                        { name: 'Charcoal', hex: '#36454F' },
+                        { name: 'Ivory', hex: '#FFFFF0' }
+                    ];
+                } else if (answers.colorScheme === 'monochromatic') {
+                    mainColors = [
+                        { name: 'Rich Plum', hex: '#734B5E' },
+                        { name: 'Soft Lavender', hex: '#C8A2C8' },
+                        { name: 'Pale Lilac', hex: '#E0CFE6' }
+                    ];
+                    accentColors = [
+                        { name: 'Deep Aubergine', hex: '#4A2639' },
+                        { name: 'Mauve', hex: '#9F6C97' }
+                    ];
+                } else if (answers.colorScheme === 'earthy') {
+                    mainColors = [
+                        { name: 'Moss Green', hex: '#8A9A5B' },
+                        { name: 'Rust', hex: '#B7410E' },
+                        { name: 'Terracotta', hex: '#C46E4F' }
+                    ];
+                    accentColors = [
+                        { name: 'Olive', hex: '#708238' },
+                        { name: 'Dark Chocolate', hex: '#4D3012' },
+                        { name: 'Wheat', hex: '#F5DEB3' }
+                    ];
+                } else { // rainbow
+                    mainColors = [
+                        { name: 'Cherry Red', hex: '#D2042D' },
+                        { name: 'Sunshine Yellow', hex: '#FFDD00' },
+                        { name: 'Sky Blue', hex: '#87CEEB' },
+                        { name: 'Royal Purple', hex: '#7851A9' },
+                        { name: 'Emerald Green', hex: '#50C878' }
+                    ];
+                    accentColors = [
+                        { name: 'Orange', hex: '#FFA500' },
+                        { name: 'Indigo', hex: '#4B0082' }
+                    ];
+                }
+                
+                // Adjust for designer influence
+                if (answers.designer === 'tula-pink') {
+                    if (answers.colorScheme !== 'rainbow') {
+                        mainColors.push({ name: 'Tula Pink Highlight', hex: '#FF69B4' });
+                    }
+                } else if (answers.designer === 'kaffe-fassett') {
+                    mainFabricYards += 1; // Kaffe designs often need more fabric for pattern matching
+                } else if (answers.designer === 'amish') {
+                    mainColors = [
+                        { name: 'Amish Black', hex: '#000000' },
+                        { name: 'Deep Purple', hex: '#301934' },
+                        { name: 'Amish Blue', hex: '#0A2463' }
+                    ];
+                    accentColors = [
+                        { name: 'Amish Red', hex: '#8B0000' }
+                    ];
+                } else if (answers.designer === 'william-morris') {
+                    mainColors = [
+                        { name: 'Morris Green', hex: '#2E4A2A' },
+                        { name: 'Morris Blue', hex: '#335D7F' },
+                        { name: 'Morris Red', hex: '#9E2B25' }
+                    ];
+                    accentColors = [
+                        { name: 'Gold Accent', hex: '#B8860B' },
+                        { name: 'Rich Cream', hex: '#F8F4E3' }
+                    ];
+                }
+                
+                // Build materials list content
+                const mainColorsList = mainColors.map((color, i) => {
+                    const fabricAmount = Math.round(mainFabricYards / mainColors.length * 10) / 10;
+                    return generateMaterialItem(color.name, fabricAmount, 'Main Fabric', color.hex);
+                }).join('');
+                
+                const accentColorsList = accentColors.map((color, i) => {
+                    const fabricAmount = Math.round(accentFabricYards / accentColors.length * 10) / 10;
+                    return generateMaterialItem(color.name, fabricAmount, 'Accent Fabric', color.hex);
+                }).join('');
+                
+                // Create the final HTML content
+                let materialsHTML = `
+                    <div class="mb-4 pb-2 border-b">
+                        <p class="text-sm mb-2">Quilt Size: ${quiltWidth}" × ${quiltLength}"</p>
+                        <p class="text-sm italic">Note: All measurements include extra fabric for seam allowances and piecing.</p>
+                    </div>
+                    <h4 class="font-medium mb-2">Main Fabrics</h4>
+                    ${mainColorsList}
+                    
+                    <h4 class="font-medium mt-4 mb-2">Accent Fabrics</h4>
+                    ${accentColorsList}
+                    
+                    <h4 class="font-medium mt-4 mb-2">Additional Materials</h4>
+                    ${generateMaterialItem('Backing Fabric', backingYards, 'Wide fabric recommended', '#F5F5F5')}
+                    ${generateMaterialItem('Batting', battingYards, '90" wide', '#FFFFFF')}
+                    ${generateMaterialItem('Binding Fabric', bindingYards, '2.5" strips', '#333333')}
+                    
+                    <div class="mt-6 pt-4 border-t">
+                        <h4 class="font-medium mb-2">Additional Supplies</h4>
+                        <ul class="list-disc pl-5">
+                            <li>Thread to match fabrics</li>
+                            <li>Rotary cutter, mat, and rulers</li>
+                            <li>Sewing machine with 1/4" piecing foot</li>
+                            <li>Iron and pressing board</li>
+                            <li>Safety pins for basting</li>
+                            <li>Walking foot for quilting</li>
+                        </ul>
+                    </div>
+                `;
+                
+                materialsContent.innerHTML = materialsHTML;
+            }
+            
+            function generateMaterialItem(name, yards, description, colorHex) {
+                return `
+                <div class="material-item">
+                    <div class="flex items-center">
+                        <span class="material-color-swatch" style="background-color: ${colorHex}"></span>
+                        <div>
+                            <p class="font-medium">${name}</p>
+                            <p class="text-sm opacity-75">${description}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold">${yards} yards</p>
+                    </div>
+                </div>`;
+            }
+        });
+    </script>
+</body>
+</html>
