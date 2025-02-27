@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Designer</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.8.0/dist/flowbite.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --light-bg-color: #FFFFFF;
+            --light-text-color: #333333;
+            --dark-bg-color: #181818;
+            --dark-text-color: #EEEEEE;
+            --form-bg-light: #F5F5F5;
+            --form-bg-dark: #2A2A2A;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light-mode {
+            background-color: var(--light-bg-color);
+            color: var(--light-text-color);
+        }
+
+        .dark-mode {
+            background-color: var(--dark-bg-color);
+            color: var(--dark-text-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .app-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .form-panel {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .light-mode .form-panel {
+            background-color: var(--form-bg-light);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .form-panel {
+            background-color: var(--form-bg-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .light-mode .form-label {
+            color: var(--light-text-color);
+        }
+
+        .dark-mode .form-label {
+            color: var(--dark-text-color);
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .light-mode select {
+            background-color: white;
+            border: 1px solid #ddd;
+            color: var(--light-text-color);
+        }
+
+        .dark-mode select {
+            background-color: #3a3a3a;
+            border: 1px solid #444;
+            color: var(--dark-text-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-icon {
+            margin-right: 8px;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 24px;
+        }
+
+        .result-image {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .light-mode .image-placeholder {
+            background-color: #F0F0F0;
+            border: 2px dashed #CCCCCC;
+            color: #888888;
+        }
+
+        .dark-mode .image-placeholder {
+            background-color: #2D2D2D;
+            border: 2px dashed #444444;
+            color: #AAAAAA;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        .dark-mode .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-color);
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e53e3e;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 600;
+            display: none;
+        }
+
+        .light-mode .error-message {
+            background-color: #fff5f5;
+        }
+
+        .dark-mode .error-message {
+            background-color: #2D2D2D;
+        }
+
+        /* Slider styles */
+        .slider-container {
+            margin-top: 12px;
+        }
+        
+        .slider-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .percentage-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #d1d5db;
+            border-radius: 4px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .dark-mode .percentage-slider {
+            background: #4b5563;
+        }
+        
+        .percentage-slider:hover {
+            opacity: 1;
+        }
+        
+        .percentage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .percentage-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .percentage-slider::-webkit-slider-thumb:hover,
+        .percentage-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1 class="app-title">Dog Designer</h1>
+            <p class="app-subtitle">Create your perfect mixed-breed dog</p>
+        </div>
+
+        <div class="form-panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="breed1" class="form-label">Dog Breed 1</label>
+                    <select id="breed1" class="text-base">
+                        <option value="">Select first breed</option>
+                        <option value="Beagle">Beagle</option>
+                        <option value="Bulldog">Bulldog</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                        <option value="Dachshund">Dachshund</option>
+                        <option value="French Bulldog">French Bulldog</option>
+                        <option value="German Shepherd">German Shepherd</option>
+                        <option value="Golden Retriever">Golden Retriever</option>
+                        <option value="Labrador Retriever">Labrador Retriever</option>
+                        <option value="Pomeranian">Pomeranian</option>
+                        <option value="Poodle">Poodle</option>
+                        <option value="Rottweiler">Rottweiler</option>
+                        <option value="Yorkshire Terrier">Yorkshire Terrier</option>
+                    </select>
+                    <div class="slider-container">
+                        <label for="breed1-percentage" class="slider-label">Genetic Influence: <span id="breed1-percentage-value">50</span>%</label>
+                        <input type="range" id="breed1-percentage" class="percentage-slider" min="0" max="100" value="50">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="breed2" class="form-label">Dog Breed 2</label>
+                    <select id="breed2" class="text-base">
+                        <option value="">Select second breed</option>
+                        <option value="Beagle">Beagle</option>
+                        <option value="Bulldog">Bulldog</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                        <option value="Dachshund">Dachshund</option>
+                        <option value="French Bulldog">French Bulldog</option>
+                        <option value="German Shepherd">German Shepherd</option>
+                        <option value="Golden Retriever">Golden Retriever</option>
+                        <option value="Labrador Retriever">Labrador Retriever</option>
+                        <option value="Pomeranian">Pomeranian</option>
+                        <option value="Poodle">Poodle</option>
+                        <option value="Rottweiler">Rottweiler</option>
+                        <option value="Yorkshire Terrier">Yorkshire Terrier</option>
+                    </select>
+                    <div class="slider-container">
+                        <label for="breed2-percentage" class="slider-label">Genetic Influence: <span id="breed2-percentage-value">50</span>%</label>
+                        <input type="range" id="breed2-percentage" class="percentage-slider" min="0" max="100" value="50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="color" class="form-label">Color</label>
+                    <select id="color" class="text-base">
+                        <option value="">Select color</option>
+                        <option value="Black">Black</option>
+                        <option value="White">White</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Golden">Golden</option>
+                        <option value="Gray">Gray</option>
+                        <option value="Tan">Tan</option>
+                        <option value="Spotted">Spotted</option>
+                        <option value="Brindle">Brindle</option>
+                        <option value="Merle">Merle</option>
+                        <option value="Black and Tan">Black and Tan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age" class="form-label">Age</label>
+                    <select id="age" class="text-base">
+                        <option value="">Select age</option>
+                        <option value="Puppy">Puppy</option>
+                        <option value="Adult">Adult</option>
+                        <option value="Senior">Senior</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button id="generateButton" type="button">
+                    <i class="fas fa-magic button-icon"></i>
+                    Generate Dog
+                </button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            Please select options from all dropdowns.
+        </div>
+
+        <div class="image-container">
+            <div id="imagePlaceholder" class="image-placeholder">
+                <i class="fas fa-dog placeholder-icon"></i>
+                <p>Select your options and click "Generate Dog" to create your perfect companion</p>
+            </div>
+            
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner"></div>
+                <p class="loading-text">Designing your perfect dog...</p>
+            </div>
+            
+            <img id="resultImage" class="result-image" alt="Generated dog image">
+        </div>
+    </div>
+
+    <script>
+        // Detect and apply the preferred color mode
+        function applyColorMode() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        // Apply color mode initially
+        applyColorMode();
+        
+        // Listen for changes to color scheme preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyColorMode);
+
+        // Get elements
+        const breed1Select = document.getElementById('breed1');
+        const breed2Select = document.getElementById('breed2');
+        const colorSelect = document.getElementById('color');
+        const ageSelect = document.getElementById('age');
+        const generateButton = document.getElementById('generateButton');
+        const resultImage = document.getElementById('resultImage');
+        const imagePlaceholder = document.getElementById('imagePlaceholder');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Get slider elements
+        const breed1Slider = document.getElementById('breed1-percentage');
+        const breed2Slider = document.getElementById('breed2-percentage');
+        const breed1PercentageValue = document.getElementById('breed1-percentage-value');
+        const breed2PercentageValue = document.getElementById('breed2-percentage-value');
+
+        // Register handler for image generation
+        window.Poe.registerHandler("dog-image-handler", (result, context) => {
+            // Hide loading spinner
+            loadingSpinner.style.display = "none";
+            
+            // Get the first response
+            const response = result.responses[0];
+            
+            // Check if there was an error
+            if (response.status === "error") {
+                errorMessage.textContent = "Error generating image: " + (response.statusText || "Please try again");
+                errorMessage.style.display = "block";
+                imagePlaceholder.style.display = "flex";
+                return;
+            }
+            
+            // Check if there's an attachment (image)
+            if (response.attachments && response.attachments.length > 0) {
+                const imageAttachment = response.attachments[0];
+                resultImage.src = imageAttachment.url;
+                resultImage.style.display = "block";
+                imagePlaceholder.style.display = "none";
+            } else {
+                // No image was found in the response
+                errorMessage.textContent = "No image was generated. Please try again.";
+                errorMessage.style.display = "block";
+                imagePlaceholder.style.display = "flex";
+            }
+        });
+
+        // Generate dog image
+        async function generateDogImage() {
+            // Get selected values
+            const breed1 = breed1Select.value;
+            const breed2 = breed2Select.value;
+            const color = colorSelect.value;
+            const age = ageSelect.value;
+            
+            // Validate inputs
+            if (!breed1 || !breed2 || !color || !age) {
+                errorMessage.textContent = "Please select options from all dropdowns.";
+                errorMessage.style.display = "block";
+                return;
+            }
+            
+            // Hide error message if it was showing
+            errorMessage.style.display = "none";
+            
+            // Hide placeholder and show loading spinner
+            imagePlaceholder.style.display = "none";
+            resultImage.style.display = "none";
+            loadingSpinner.style.display = "flex";
+            
+            // Get genetic percentages
+            const breed1Percentage = parseInt(breed1Slider.value);
+            const breed2Percentage = parseInt(breed2Slider.value);
+            
+            // Create prompt for FLUX with enhanced genetic mixing instructions
+            let prompt = `A photorealistic ${color} ${age.toLowerCase()} dog that's a genetic mix of ${breed1Percentage}% ${breed1} and ${breed2Percentage}% ${breed2}. The dog should visually display physical characteristics that accurately reflect these exact percentages - the ${breed1Percentage > breed2Percentage ? breed1 : breed2} features should be much more prominent. The physical traits, proportions, and appearance should clearly show a ${breed1Percentage}/${breed2Percentage} mix ratio. The dog is looking directly at the camera with friendly eyes. High-quality, detailed image, natural lighting, studio photography. --aspect 1:1`;
+            
+            try {
+                // Send message to FLUX for image generation
+                await window.Poe.sendUserMessage(
+                    `@FLUX-pro-1.1 ${prompt}`,
+                    {
+                        handler: "dog-image-handler",
+                        stream: false,
+                        openChat: false
+                    }
+                );
+            } catch (err) {
+                // Show error message
+                loadingSpinner.style.display = "none";
+                imagePlaceholder.style.display = "flex";
+                errorMessage.textContent = "Error: " + err.message;
+                errorMessage.style.display = "block";
+            }
+        }
+
+        // Function to update slider values
+        function updateSliders(changedSliderId) {
+            const breed1Value = parseInt(breed1Slider.value);
+            
+            // Always make the other slider's value complement to 100%
+            if (changedSliderId === 'breed1-percentage') {
+                // If breed1 slider was changed, adjust breed2 to complement
+                breed2Slider.value = 100 - breed1Value;
+            } else {
+                // If breed2 slider was changed, adjust breed1 to complement
+                const breed2Value = parseInt(breed2Slider.value);
+                breed1Slider.value = 100 - breed2Value;
+            }
+            
+            // Update displayed values after adjustment
+            breed1PercentageValue.textContent = parseInt(breed1Slider.value);
+            breed2PercentageValue.textContent = parseInt(breed2Slider.value);
+        }
+        
+        // Add event listeners to sliders
+        breed1Slider.addEventListener('input', () => updateSliders('breed1-percentage'));
+        breed2Slider.addEventListener('input', () => updateSliders('breed2-percentage'));
+        
+        // Initialize sliders
+        updateSliders('breed1-percentage');
+        
+        // Add event listener to button
+        generateButton.addEventListener('click', generateDogImage);
+    </script>
+</body>
+</html>
