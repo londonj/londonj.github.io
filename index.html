@@ -1,16 +1,24 @@
+<!-- Main HTML document -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for character encoding and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Selection</title>
+    
+    <!-- External CSS dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet">
+    
+    <!-- Custom styles -->
     <style>
+        /* CSS Variables */
         :root {
             --primary-color: #5D5CDE;
         }
         
+        /* Card hover animations */
         .app-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -20,6 +28,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         
+        /* Icon animation on card hover */
         .card-icon {
             transition: all 0.3s ease;
         }
@@ -28,6 +37,7 @@
             transform: scale(1.1);
         }
         
+        /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #181818;
@@ -40,6 +50,7 @@
             }
         }
         
+        /* Light mode styles */
         @media (prefers-color-scheme: light) {
             body {
                 background-color: #ffffff;
@@ -54,6 +65,7 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+    <!-- Header section with gradient background -->
     <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 shadow-md">
         <div class="container mx-auto">
             <h1 class="text-3xl font-bold text-center">App Selection</h1>
@@ -61,9 +73,12 @@
         </div>
     </header>
     
+    <!-- Main content area -->
     <main class="container mx-auto flex-grow p-6">
+        <!-- Grid layout for app cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-8">
             <!-- Quilt Maker Card -->
+            <!-- Card structure: Icon section, Content section, Action button -->
             <a href="QuiltMaker.html" target="_blank" class="app-card rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg flex flex-col h-full">
                 <div class="bg-indigo-100 dark:bg-indigo-900 p-8 flex justify-center">
                     <div class="card-icon text-6xl text-indigo-600 dark:text-indigo-400">
@@ -87,6 +102,7 @@
             </a>
             
             <!-- Dog Designer Card -->
+            <!-- Card structure: Icon section, Content section, Action button -->
             <a href="DogDesigner.html" target="_blank" class="app-card rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg flex flex-col h-full">
                 <div class="bg-amber-100 dark:bg-amber-900 p-8 flex justify-center">
                     <div class="card-icon text-6xl text-amber-600 dark:text-amber-400">
@@ -111,12 +127,14 @@
         </div>
     </main>
     
+    <!-- Footer section -->
     <footer class="bg-gray-100 dark:bg-gray-900 p-6 mt-8">
         <div class="container mx-auto text-center text-gray-600 dark:text-gray-400">
             <p>© 2023 App Selection Menu. All rights reserved.</p>
         </div>
     </footer>
     
+    <!-- JavaScript dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
 </body>
 </html>
